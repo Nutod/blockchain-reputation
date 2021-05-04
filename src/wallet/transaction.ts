@@ -9,7 +9,7 @@ interface SenderWallet {
   sign: (params: any) => any
 }
 
-interface ITransaction {
+export interface ITransaction {
   id: string
   input: TransactionInput
   outputMap: any

@@ -1,21 +1,22 @@
-import Elliptic from 'elliptic';
-import cryptoHash from './crypto-hash';
+import Elliptic from 'elliptic'
+import cryptoHash from './crypto-hash'
 
-const EC = Elliptic.ec;
-const ec = new EC('secp256k1');
+const EC = Elliptic.ec
 
-export default function verifySignature({
+export const ec = new EC('secp256k1')
+
+export function verifySignature({
   publicKey,
   data,
   signature,
 }: {
-  publicKey: string;
-  data: any;
-  signature: any;
+  publicKey: string
+  data: any
+  signature: any
 }) {
   // Retrieving the private from the public
-  const keyFromPublic = ec.keyFromPublic(publicKey, 'hex');
+  const keyFromPublic = ec.keyFromPublic(publicKey, 'hex')
 
   // Return a Boolean as you might expect
-  return keyFromPublic.verify(cryptoHash(data), signature);
+  return keyFromPublic.verify(cryptoHash(data), signature)
 }

@@ -1,5 +1,5 @@
 import uuid from 'uuid'
-import { verifySignature } from 'src/lib/keys'
+import { verifySignature } from '../lib/keys'
 
 interface SenderWallet {
   balance?: number

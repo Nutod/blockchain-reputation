@@ -4,7 +4,6 @@
     "module": "commonjs",
     "lib": ["es6"],
     "allowJs": true,
-    "baseUrl": ".",
     "outDir": "build",
     "rootDir": "src",
     "strict": true,

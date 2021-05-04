@@ -1,5 +1,5 @@
 import redis from 'redis'
-import { ITransaction } from 'src/wallet/transaction'
+import { ITransaction } from '../wallet/transaction'
 
 const CHANNELS = {
   BLOCKCHAIN: 'BLOCKCHAIN',

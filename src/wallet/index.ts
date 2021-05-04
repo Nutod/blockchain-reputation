@@ -1,6 +1,6 @@
-import { DEFAULT_REPUTATION } from 'src/config'
-import cryptoHash from 'src/lib/crypto-hash'
-import { ec } from 'src/lib/keys'
+import { DEFAULT_REPUTATION } from '../config'
+import cryptoHash from '../lib/crypto-hash'
+import { ec } from '../lib/keys'
 import Transaction from './transaction'
 
 export default class Wallet {

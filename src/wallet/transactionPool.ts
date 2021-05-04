@@ -1,4 +1,4 @@
-import { IBlock } from 'src/dlt/block'
+import { IBlock } from '../dlt/block'
 import type { ITransaction } from './transaction'
 import Transaction from './transaction'
 

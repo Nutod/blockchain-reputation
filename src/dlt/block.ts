@@ -1,5 +1,5 @@
-import cryptoHash from 'src/lib/crypto-hash'
-import { GENESIS_DATA } from 'src/config'
+import cryptoHash from '../lib/crypto-hash'
+import { GENESIS_DATA } from '../config'
 
 export interface IBlock {
   lastHash: string
@@ -37,11 +37,6 @@ export default class Block {
 
   static mineBlock({ lastBlock, data }: { lastBlock: IBlock; data: any[] }) {
     // do some things here
-
-    //  lastHash: string
-    //  hash: string
-    //  data: any[]
-    //  timestamp: number
 
     const lastHash = lastBlock.hash
     const timestamp = Date.now()

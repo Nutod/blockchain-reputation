@@ -1,6 +1,7 @@
 import Block, { IBlock } from './block'
 import cryptoHash from 'src/lib/crypto-hash'
 import { REWARD_INPUT, REWARD } from 'src/config'
+import Transaction from 'src/wallet/transaction'
 
 export class Blockchain {
   constructor(public chain: IBlock[] = [Block.genesis()]) {}

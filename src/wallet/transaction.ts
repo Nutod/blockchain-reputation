@@ -1,6 +1,5 @@
 import uuid from 'uuid'
 import { verifySignature } from 'src/lib/keys'
-import { ec } from 'elliptic'
 
 interface SenderWallet {
   balance?: number
@@ -10,9 +9,22 @@ interface SenderWallet {
   sign: (params: any) => any
 }
 
+interface ITransaction {
+  id: string
+  input: TransactionInput
+  outputMap: any
+}
+
+interface TransactionInput {
+  timestamp: number
+  address: string
+  signature: any
+  amount: number
+}
+
 export default class Transaction {
   id: string
-  input: any
+  input: TransactionInput
   outputMap: any
 
   constructor({
@@ -26,7 +38,7 @@ export default class Transaction {
     recipient: string
     amount: number
     outputMap?: any
-    input?: any
+    input?: TransactionInput
   }) {
     this.id = uuid.v4()
     this.outputMap =
@@ -70,5 +82,20 @@ export default class Transaction {
     outputMap[senderWallet.publicKey] = senderWallet.reputation - amount
 
     return outputMap
+  }
+
+  static validTransaction(transaction: ITransaction) {
+    // TODO: What is a valid transaction?
+    // Maximum value that can be given to another participant
+
+    const { outputMap, input } = transaction
+    const { signature, address } = input
+
+    if (!verifySignature({ publicKey: address, data: outputMap, signature })) {
+      console.error('Invalid Signature detected')
+      return false
+    }
+
+    return true
   }
 }

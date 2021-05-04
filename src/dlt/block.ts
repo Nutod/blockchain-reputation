@@ -1,7 +1,7 @@
 import cryptoHash from 'src/lib/crypto-hash'
 import { GENESIS_DATA } from 'src/config'
 
-interface BlockItem {
+export interface IBlock {
   lastHash: string
   hash: string
   data: any[]
@@ -35,7 +35,7 @@ export default class Block {
     return new this(GENESIS_DATA)
   }
 
-  static mineBlock({ lastBlock, data }: { lastBlock: BlockItem; data: any[] }) {
+  static mineBlock({ lastBlock, data }: { lastBlock: IBlock; data: any[] }) {
     // do some things here
 
     //  lastHash: string

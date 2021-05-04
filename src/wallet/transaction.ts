@@ -3,18 +3,31 @@ import { verifySignature } from 'src/lib/keys'
 import { ec } from 'elliptic'
 
 interface SenderWallet {
-   balance: number
-   reputation: number
-   keyPair: ec.KeyPairOptions
-
+  balance?: number
+  reputation: number
+  keyPair: any
+  publicKey: string
+  sign: (params: any) => any
 }
 
-export class Transaction {
+export default class Transaction {
   id: string
   input: any
   outputMap: any
 
-  constructor({ senderWallet, recipient, amount, outputMap, input }) {
+  constructor({
+    senderWallet,
+    recipient,
+    amount,
+    outputMap,
+    input,
+  }: {
+    senderWallet: SenderWallet
+    recipient: string
+    amount: number
+    outputMap?: any
+    input?: any
+  }) {
     this.id = uuid.v4()
     this.outputMap =
       outputMap || this.createOutputMap({ senderWallet, recipient, amount })
@@ -22,13 +35,40 @@ export class Transaction {
       input || this.createInput({ senderWallet, outputMap: this.outputMap })
   }
 
-  createInput({ senderWallet, outputMap }: {}) {
+  createInput({
+    senderWallet,
+    outputMap,
+  }: {
+    senderWallet: SenderWallet
+    outputMap: any
+  }) {
     return {
       timestamp: Date.now(),
       address: senderWallet.publicKey,
       signature: senderWallet.sign(outputMap),
-      // TODO: Optional, reputation value of the sender? Usually defaults to the starting reputation value
-      amount: senderWallet.balance,
+      amount: senderWallet.reputation,
     }
+  }
+
+  createOutputMap({
+    senderWallet,
+    recipient,
+    amount,
+  }: {
+    senderWallet: SenderWallet
+    recipient: string
+    amount: number
+  }) {
+    // Generic function that maps sender's intrinsic value to the value to be given
+    const outputMap = {} as { [id: string]: any }
+
+    // TODO: Here, we need to make updates. How do we express the reputation values here?
+
+    // There's two parts here, the first is the value to be given
+    // The second part is the value assigned to the giver
+    outputMap[recipient] = amount
+    outputMap[senderWallet.publicKey] = senderWallet.reputation - amount
+
+    return outputMap
   }
 }

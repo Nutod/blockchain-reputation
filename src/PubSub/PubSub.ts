@@ -1,5 +1,7 @@
 import redis from 'redis'
+import Blockchain from '../dlt/blockchain'
 import { ITransaction } from '../wallet/transaction'
+import TransactionPool from '../wallet/transactionPool'
 
 const CHANNELS = {
   BLOCKCHAIN: 'BLOCKCHAIN',
@@ -11,15 +13,15 @@ export default class PubSub {
   publisher: redis.RedisClient
   subscriber: redis.RedisClient
 
-  blockchain: any
-  transactionPool: any
+  blockchain: InstanceType<typeof Blockchain>
+  transactionPool: InstanceType<typeof TransactionPool>
 
   constructor({
     blockchain,
     transactionPool,
   }: {
-    blockchain: any
-    transactionPool: any
+    blockchain: InstanceType<typeof Blockchain>
+    transactionPool: InstanceType<typeof TransactionPool>
   }) {
     this.blockchain = blockchain
     this.transactionPool = transactionPool

@@ -21,7 +21,7 @@ export default class TransactionPool {
   }
 
   // Validating the cryptographic integrity of multiple transactions at a go
-  validTransactions() {
+  validTransactions(): ITransaction[] {
     return Object.values(this.transactionMap).filter((transaction) =>
       Transaction.validTransaction(transaction),
     )

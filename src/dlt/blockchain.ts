@@ -1,12 +1,12 @@
 import Block, { IBlock } from './block'
 import cryptoHash from '../lib/crypto-hash'
 import { REWARD_INPUT, REWARD } from '../config'
-import Transaction from '../wallet/transaction'
+import Transaction, { ITransaction } from '../wallet/transaction'
 
 export default class Blockchain {
   constructor(public chain: IBlock[] = [Block.genesis()]) {}
 
-  addBlock({ data }: { data: any[] }) {
+  addBlock({ data }: { data: ITransaction[] }) {
     const lastBlock = this.chain[this.chain.length - 1]
     const newBlock = Block.mineBlock({ data, lastBlock })
 
@@ -46,7 +46,7 @@ export default class Blockchain {
 
   replaceChain(
     chain: IBlock[],
-    validateTransactions?: boolean,
+    validateTransactions?: () => void,
     successCallback?: () => void,
   ) {
     if (chain.length <= this.chain.length) {

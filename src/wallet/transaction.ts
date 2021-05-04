@@ -1,13 +1,6 @@
 import uuid from 'uuid'
+import Wallet from '.'
 import { verifySignature } from '../lib/keys'
-
-interface SenderWallet {
-  balance?: number
-  reputation: number
-  keyPair: any
-  publicKey: string
-  sign: (params: any) => any
-}
 
 export interface ITransaction {
   id: string
@@ -34,7 +27,7 @@ export default class Transaction {
     outputMap,
     input,
   }: {
-    senderWallet: SenderWallet
+    senderWallet: InstanceType<typeof Wallet>
     recipient: string
     amount: number
     outputMap?: any
@@ -51,7 +44,7 @@ export default class Transaction {
     senderWallet,
     outputMap,
   }: {
-    senderWallet: SenderWallet
+    senderWallet: InstanceType<typeof Wallet>
     outputMap: any
   }) {
     return {
@@ -67,7 +60,7 @@ export default class Transaction {
     recipient,
     amount,
   }: {
-    senderWallet: SenderWallet
+    senderWallet: InstanceType<typeof Wallet>
     recipient: string
     amount: number
   }) {

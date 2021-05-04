@@ -4,10 +4,20 @@
 import Blockchain from './dlt/blockchain'
 import PubSub from './PubSub/PubSub'
 import Wallet from './wallet'
-import TransactionMiner from './wallet/transactionMiner'
 import TransactionPool from './wallet/transactionPool'
+import TransactionMiner from './wallet/transactionMiner'
+import { ITransaction } from './wallet/transaction'
 
 const blockchain = new Blockchain()
+const transactionPool = new TransactionPool()
+const pubsub = new PubSub({ blockchain, transactionPool })
+const wallet = new Wallet()
+// const transactionMiner = new TransactionMiner({
+//   blockchain,
+//   transactionPool,
+//   wallet,
+//   pubsub,
+// })
 
 function blockchainService() {
   return {
@@ -20,6 +30,12 @@ function blockchainService() {
         data: blockchain.chain,
       }
     },
+    // called during consensus
+    mineBlock(data: ITransaction[]) {
+      blockchain.addBlock({ data })
+    },
+    // called between two nodes
+    transact() {},
   }
 }
 

@@ -1,17 +1,18 @@
 import cryptoHash from '../lib/crypto-hash'
 import { GENESIS_DATA } from '../config'
+import { ITransaction } from '../wallet/transaction'
 
 export interface IBlock {
   lastHash: string
   hash: string
-  data: any[]
+  data: ITransaction[]
   timestamp: number
 }
 
 export default class Block {
   lastHash: string
   hash: string
-  data: any[]
+  data: ITransaction[]
   timestamp: number
 
   constructor({
@@ -22,7 +23,7 @@ export default class Block {
   }: {
     lastHash: string
     hash: string
-    data: any[]
+    data: ITransaction[]
     timestamp: number
   }) {
     this.lastHash = lastHash
@@ -35,7 +36,7 @@ export default class Block {
     return new this(GENESIS_DATA)
   }
 
-  static mineBlock({ lastBlock, data }: { lastBlock: IBlock; data: any[] }) {
+  static mineBlock({ lastBlock, data }: { lastBlock: IBlock; data: ITransaction[] }) {
     // do some things here
 
     const lastHash = lastBlock.hash

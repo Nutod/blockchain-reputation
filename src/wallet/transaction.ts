@@ -1,6 +1,6 @@
 import uuid from 'uuid'
 import Wallet from '.'
-import { ec, verifySignature } from '../lib/keys'
+import { verifySignature } from '../lib/keys'
 
 export interface ITransaction {
   id: string

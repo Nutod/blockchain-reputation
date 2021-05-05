@@ -1,6 +1,6 @@
 import uuid from 'uuid'
 import Wallet from '.'
-import { verifySignature } from '../lib/keys'
+import { ec, verifySignature } from '../lib/keys'
 
 export interface ITransaction {
   id: string
@@ -81,7 +81,6 @@ export default class Transaction {
   }
 
   static validTransaction(transaction: ITransaction) {
-    // TODO: What is a valid transaction?
     // Maximum value that can be given to another participant
 
     const { outputMap, input } = transaction

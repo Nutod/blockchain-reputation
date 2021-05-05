@@ -29,6 +29,7 @@ export default class Blockchain {
       const actualLastHash = chain[i - 1].hash
 
       if (lastHash !== actualLastHash) {
+        console.log(lastHash, actualLastHash)
         console.log('hash values do not match')
         return false
       }
@@ -55,6 +56,7 @@ export default class Blockchain {
     }
 
     if (!Blockchain.isValid(chain)) {
+      console.log('Invalid')
       return
     }
 
@@ -68,6 +70,7 @@ export default class Blockchain {
     }
 
     // If nothing goes wrong, then you can replace
+    console.log('Will replace chain')
     this.chain = chain
   }
 

@@ -2,10 +2,11 @@ import { IBlock } from '../dlt/block'
 import type { ITransaction } from './transaction'
 import Transaction from './transaction'
 
+interface TransactionMap {
+  [id: string]: ITransaction
+}
 export default class TransactionPool {
-  transactionMap: {
-    [id: string]: any
-  }
+  transactionMap: TransactionMap
 
   constructor() {
     this.transactionMap = {}
@@ -16,7 +17,7 @@ export default class TransactionPool {
   }
 
   // For replacing transaction pool after a block is added or a new node joins the network
-  setTransactionMap(transactionMap: { [id: string]: any }) {
+  setTransactionMap(transactionMap: TransactionMap) {
     this.transactionMap = transactionMap
   }
 

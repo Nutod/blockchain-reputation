@@ -30,6 +30,10 @@ let PEER_PORT
 
 const ROOT_ADDRESS = `http://localhost:${DEFAULT_PORT}`
 
+if (process.env.GENERATE_PEER_PORT === 'true') {
+  PEER_PORT = process.env.PORT
+}
+
 const PORT = PEER_PORT || DEFAULT_PORT
 
 function server() {

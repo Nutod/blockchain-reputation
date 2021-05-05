@@ -10,7 +10,7 @@ import { ITransaction } from './wallet/transaction'
 
 const blockchain = new Blockchain()
 const transactionPool = new TransactionPool()
-const pubsub = new PubSub({ blockchain, transactionPool })
+// const pubsub = new PubSub({ blockchain, transactionPool })
 const wallet = new Wallet()
 // const transactionMiner = new TransactionMiner({
 //   blockchain,
@@ -19,27 +19,54 @@ const wallet = new Wallet()
 //   pubsub,
 // })
 
-function blockchainService() {
-  return {
-    init() {
-      console.log('Running...')
-    },
-    getBlockchain() {
-      return {
-        status: true,
-        data: blockchain.chain,
-      }
-    },
-    // called during consensus
-    mineBlock(data: ITransaction[]) {
-      blockchain.addBlock({ data })
-    },
-    // called between two nodes
-    transact() {},
+class BlockchainService {
+  constructor(public running: boolean = false) {}
+
+  init() {
+    this.running = true
+    console.log('Running...')
+  }
+
+  chainState() {
+    return {
+      data: blockchain.chain,
+    }
+  }
+
+  mineBlock(data: ITransaction[]) {
+    blockchain.addBlock({ data })
   }
 }
 
-blockchainService().init()
-const initialBlockData = blockchainService().getBlockchain()
+const blockchainService = new BlockchainService()
 
-console.log(initialBlockData)
+blockchainService.init()
+
+const chainData = blockchainService.chainState()
+
+// 2. Adding a new block
+
+// export interface ITransaction {
+//   id: string
+//   input: TransactionInput
+//   outputMap: any
+// }
+
+// interface TransactionInput {
+//   timestamp: number
+//   address: string
+//   signature: any
+//   amount: number
+// }
+const demoData = {
+  id: 'asfjvnafv',
+  input: {
+    timestamp: 120023,
+    address: 'sdkfskd',
+    signature: 'asfkvjsndfb',
+    amount: 12,
+  },
+  outputMap: {
+    
+  }
+}

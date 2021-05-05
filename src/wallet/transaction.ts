@@ -5,7 +5,7 @@ import { verifySignature } from '../lib/keys'
 export interface ITransaction {
   id: string
   input: TransactionInput
-  outputMap: any
+  outputMap: TransactionOutput
 }
 
 interface TransactionInput {
@@ -15,10 +15,16 @@ interface TransactionInput {
   amount: number
 }
 
+export interface TransactionOutput {
+  recipient: string
+  amount: number
+  senderWallet: number
+}
+
 export default class Transaction {
   id: string
   input: TransactionInput
-  outputMap: any
+  outputMap: TransactionOutput
 
   constructor({
     senderWallet,
@@ -30,7 +36,7 @@ export default class Transaction {
     senderWallet: InstanceType<typeof Wallet>
     recipient: string
     amount: number
-    outputMap?: any
+    outputMap?: TransactionOutput
     input?: TransactionInput
   }) {
     this.id = uuid.v4()
@@ -45,7 +51,7 @@ export default class Transaction {
     outputMap,
   }: {
     senderWallet: InstanceType<typeof Wallet>
-    outputMap: any
+    outputMap: TransactionOutput
   }) {
     return {
       timestamp: Date.now(),
@@ -65,14 +71,11 @@ export default class Transaction {
     amount: number
   }) {
     // Generic function that maps sender's intrinsic value to the value to be given
-    const outputMap = {} as { [id: string]: any }
+    const outputMap = {} as TransactionOutput
 
-    // TODO: Here, we need to make updates. How do we express the reputation values here?
-
-    // There's two parts here, the first is the value to be given
-    // The second part is the value assigned to the giver
-    outputMap[recipient] = amount
-    outputMap[senderWallet.publicKey] = senderWallet.reputation - amount
+    outputMap['recipient'] = recipient
+    outputMap['amount'] = amount
+    outputMap['senderWallet'] = senderWallet.reputation
 
     return outputMap
   }

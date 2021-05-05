@@ -1,22 +1,22 @@
 import { DEFAULT_REPUTATION } from '../config'
 import cryptoHash from '../lib/crypto-hash'
 import { ec } from '../lib/keys'
-import Transaction from './transaction'
+import Transaction, { TransactionOutput } from './transaction'
 
 export default class Wallet {
   reputation: number
-  keyPair: any
-  publicKey: string & number[]
+  keyPair: ReturnType<typeof ec.genKeyPair>
+  publicKey: string
 
   constructor() {
     this.reputation = DEFAULT_REPUTATION
 
     this.keyPair = ec.genKeyPair()
 
-    this.publicKey = this.keyPair.getPublic().encode('hex')
+    this.publicKey = this.keyPair.getPublic().encode('hex', true)
   }
 
-  sign(data: any) {
+  sign(data: TransactionOutput) {
     return this.keyPair.sign(cryptoHash(data))
   }
 

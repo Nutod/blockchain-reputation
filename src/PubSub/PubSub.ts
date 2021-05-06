@@ -6,7 +6,6 @@ import TransactionPool from '../wallet/transactionPool'
 const CHANNELS = {
   BLOCKCHAIN: 'BLOCKCHAIN',
   TRANSACTION: 'TRANSACTION',
-  CONSENSUS: 'CONSENSUS',
 }
 
 export default class PubSub {

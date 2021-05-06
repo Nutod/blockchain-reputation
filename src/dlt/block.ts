@@ -36,7 +36,13 @@ export default class Block {
     return new this(GENESIS_DATA)
   }
 
-  static mineBlock({ lastBlock, data }: { lastBlock: IBlock; data: ITransaction[] }) {
+  static mineBlock({
+    lastBlock,
+    data,
+  }: {
+    lastBlock: IBlock
+    data: ITransaction[]
+  }) {
     // do some things here
 
     const lastHash = lastBlock.hash

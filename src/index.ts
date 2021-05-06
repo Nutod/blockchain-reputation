@@ -10,6 +10,7 @@ import TransactionMiner from './wallet/transactionMiner'
 import { ITransaction } from './wallet/transaction'
 import { IBlock } from './dlt/block'
 import { GENESIS_DATA } from './config'
+import Registry from './lib/registry'
 
 // All nodes are running an instance of these classes
 const blockchain = new Blockchain()
@@ -22,6 +23,7 @@ const transactionMiner = new TransactionMiner({
   wallet,
   pubsub,
 })
+let registry: any
 
 const app = express()
 
@@ -88,6 +90,13 @@ function server() {
     if (PORT !== DEFAULT_PORT) {
       synchronizeChain()
       synchronizeTransactionMap()
+      // broadcast your port and public key to the other nodes
+      // you also need to be aware of the ids from the other
+
+      // API request to manage this?
+      // synchronizePeers()
+
+      // register key
     }
   })
 }
@@ -122,47 +131,7 @@ function synchronizeTransactionMap() {
 
 server()
 
-// class BlockchainService {
-//   constructor(public running: boolean = false) {}
-
-//   init() {
-//     this.running = true
-//     console.log('Running...')
-//   }
-
-//   chainState() {
-//     return {
-//       chainState: blockchain.chain,
-//     }
-//   }
-
-//   mineBlock(data: ITransaction[]) {
-//     const newBlock = blockchain.addBlock({ data })
-//     console.log(newBlock)
-
-//     return newBlock
-//   }
-
-//   mineTransactions() {
-//     // runs the creation and addition of a new block
-//     transactionMiner.mineTransactions()
-//   }
-
-//   synchronizeChain(chain: IBlock[]) {
-//     const newChain = [GENESIS_DATA, ...chain]
-//     blockchain.replaceChain(newChain)
-//   }
-
-//   synchronizeTransactionMap(data: TransactionMap) {
-//     transactionPool.setTransactionMap(data)
-//   }
-// }
-
-// const blockchainService = new BlockchainService()
-
-// blockchainService.init()
-
-// const chainData = blockchainService.chainState()
+// TODO: Add static keys? Use a key registry? Class manages all keys mapped to ports
 
 const demoData = {
   id: 'IDENTIFICATION',

@@ -23,7 +23,7 @@ const transactionMiner = new TransactionMiner({
   wallet,
   pubsub,
 })
-let registry: any
+let registry = new Registry()
 
 const app = express()
 
@@ -34,6 +34,8 @@ const ROOT_ADDRESS = `http://localhost:${DEFAULT_PORT}`
 
 if (process.env.GENERATE_PEER_PORT === 'true') {
   PEER_PORT = process.env.PORT
+} else {
+  registry.addToRegistry(DEFAULT_PORT.toString(), wallet.publicKey)
 }
 
 const PORT = PEER_PORT || DEFAULT_PORT
@@ -70,6 +72,15 @@ function server() {
     })
   })
 
+  app.get('/api/synchronize/peers', (_req, res) => {
+    const keyToNodeMap = registry.keyToNodeMap
+
+    res.json({
+      status: true,
+      registry: keyToNodeMap,
+    })
+  })
+
   app.post('/api/transact', (req, res) => {
     const { amount, recipient } = req.body as {
       amount: number
@@ -84,7 +95,7 @@ function server() {
     res.status(200).json({ status: true, data: transaction })
   })
 
-  app.listen(PORT, () => {
+  app.listen(PORT, async () => {
     console.log(`[SERVER] running on ${PORT}`)
 
     if (PORT !== DEFAULT_PORT) {
@@ -92,9 +103,10 @@ function server() {
       synchronizeTransactionMap()
       // broadcast your port and public key to the other nodes
       // you also need to be aware of the ids from the other
+      
 
       // API request to manage this?
-      // synchronizePeers()
+      synchronizePeers()
 
       // register key
     }
@@ -125,6 +137,21 @@ function synchronizeTransactionMap() {
     })
     .then((data) => {
       transactionPool.setTransactionMap(data)
+    })
+    .catch((err) => console.error(err))
+}
+
+function synchronizePeers() {
+  fetch(`${ROOT_ADDRESS}/api/synchronize/peers`)
+    .then((res) => {
+      if (res.ok === true) {
+        return res.json()
+      } else {
+        return Promise.reject({ message: 'Error occurred' })
+      }
+    })
+    .then(({ registry }) => {
+      registry.setRegistry(registry)
     })
     .catch((err) => console.error(err))
 }

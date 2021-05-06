@@ -10,4 +10,8 @@ export default class Registry {
   addToRegistry(id: string, publicKey: string) {
     this.keyToNodeMap[id] = publicKey
   }
+
+  setRegistry(data: { [id: string]: string }) {
+    this.keyToNodeMap = data
+  }
 }

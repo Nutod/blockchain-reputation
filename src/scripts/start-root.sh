@@ -4,3 +4,9 @@
 cd ../../
 
 ls
+
+npm start
+
+# cd src/scripts
+
+# ./kill-all.sh

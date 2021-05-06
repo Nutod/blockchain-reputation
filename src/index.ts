@@ -40,13 +40,84 @@ function server() {
   app.use(cors())
   app.use(express.json())
 
-  app.get('/', (req, res) => {
-    res.json({ status: true })
+  app.get('/', (_req, res) => {
+    res.json({ status: true, message: 'Do you need me to do something?' })
+  })
+
+  app.get('/api/blocks', (_req, res) => {
+    res.status(200).json({ status: true, data: blockchain.chain })
+  })
+
+  app.get('/api/transaction/pool', (_req, res) => {
+    res.status(200).json(transactionPool.transactionMap)
+  })
+
+  app.get('/api/transaction/mine', (_req, res) => {
+    transactionMiner.mineTransactions()
+
+    res.status(200).json({ status: true, message: 'Mined' })
+    // res.redirect('/api/blocks')
+  })
+
+  app.get('/api/wallet/info', (_req, res) => {
+    const address = wallet.publicKey
+
+    res.json({
+      status: true,
+      address,
+    })
+  })
+
+  app.post('/api/transact', (req, res) => {
+    const { amount, recipient } = req.body as {
+      amount: number
+      recipient: string
+    }
+
+    const transaction = wallet.createTransaction({ recipient, amount })
+    transactionPool.setTransaction(transaction)
+    pubsub.broadcastTransaction(transaction)
+    console.log('Pool', transactionPool)
+
+    res.status(200).json({ status: true, data: transaction })
   })
 
   app.listen(PORT, () => {
     console.log(`[SERVER] running on ${PORT}`)
+
+    if (PORT !== DEFAULT_PORT) {
+      synchronizeChain()
+      synchronizeTransactionMap()
+    }
   })
+}
+
+function synchronizeChain() {
+  fetch(`${ROOT_ADDRESS}/api/blocks`)
+    .then((res) => {
+      if (res.ok === true) {
+        return res.json()
+      } else {
+        return Promise.reject({ message: 'Error occurred' })
+      }
+    })
+    .then(({ data }) => blockchain.replaceChain(data))
+    .catch((err) => console.error(err))
+}
+
+function synchronizeTransactionMap() {
+  fetch(`${ROOT_ADDRESS}/api/transaction/pool`)
+    .then((res) => {
+      if (res.ok === true) {
+        return res.json()
+      } else {
+        return Promise.reject({ message: 'Error occurred' })
+      }
+    })
+    .then((data) => {
+      transactionPool.setTransactionMap(data)
+    })
+    .catch((err) => console.error(err))
 }
 
 server()
@@ -124,7 +195,7 @@ const demoData = {
 
 // console.log(chainData)
 
-/* TODO: 
+/*  
 
 3. Wallet Info
 6. Transaction between two nodes

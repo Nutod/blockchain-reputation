@@ -1,5 +1,6 @@
 import redis from 'redis'
 import Blockchain from '../dlt/blockchain'
+import Registry from '../lib/registry'
 import { ITransaction } from '../wallet/transaction'
 import TransactionPool from '../wallet/transactionPool'
 
@@ -15,16 +16,20 @@ export default class PubSub {
 
   blockchain: InstanceType<typeof Blockchain>
   transactionPool: InstanceType<typeof TransactionPool>
+  registry: InstanceType<typeof Registry>
 
   constructor({
     blockchain,
     transactionPool,
+    registry,
   }: {
     blockchain: InstanceType<typeof Blockchain>
     transactionPool: InstanceType<typeof TransactionPool>
+    registry: InstanceType<typeof Registry>
   }) {
     this.blockchain = blockchain
     this.transactionPool = transactionPool
+    this.registry = registry
 
     this.publisher = redis.createClient()
     this.subscriber = redis.createClient()
@@ -42,11 +47,11 @@ export default class PubSub {
     })
   }
 
-  handleMessage(channel: string, message: any) {
-    const parsedMessage = JSON.parse(message)
-
+  handleMessage(channel: string, message: string) {
     // Here, we are attempting to replace the Blockchain
     if (channel === CHANNELS.BLOCKCHAIN) {
+      const parsedMessage = JSON.parse(message)
+
       this.blockchain.replaceChain(parsedMessage, () => {
         this.transactionPool.clearBlockchainTransaction({
           chain: parsedMessage,
@@ -56,7 +61,15 @@ export default class PubSub {
 
     // Here we are attempting to set transactions to the subscriber's pool
     if (channel === CHANNELS.TRANSACTION) {
+      const parsedMessage = JSON.parse(message)
+
       this.transactionPool.setTransaction(parsedMessage)
+    }
+
+    if (channel === CHANNELS.NODE) {
+      const registryInfo = message.split(',')
+
+      this.registry.addToRegistry(registryInfo[0], registryInfo[1])
     }
   }
 
@@ -85,10 +98,10 @@ export default class PubSub {
     })
   }
 
-  broadcastNode(port: number, publicKey: string) {
+  broadcastNode(port: number | string, publicKey: string) {
     this.publish({
       channel: CHANNELS.NODE,
-      message: JSON.stringify(`${port},${publicKey}`),
+      message: `${port},${publicKey}`,
     })
   }
 }

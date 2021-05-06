@@ -5,25 +5,23 @@ import fetch from 'node-fetch'
 import Blockchain from './dlt/blockchain'
 import PubSub from './PubSub/PubSub'
 import Wallet from './wallet'
-import TransactionPool, { TransactionMap } from './wallet/transactionPool'
+import TransactionPool from './wallet/transactionPool'
 import TransactionMiner from './wallet/transactionMiner'
-import { ITransaction } from './wallet/transaction'
-import { IBlock } from './dlt/block'
-import { GENESIS_DATA } from './config'
 import Registry from './lib/registry'
+import { delay } from './lib/delay'
 
 // All nodes are running an instance of these classes
 const blockchain = new Blockchain()
 const transactionPool = new TransactionPool()
-const pubsub = new PubSub({ blockchain, transactionPool })
 const wallet = new Wallet()
+const registry = new Registry()
+const pubsub = new PubSub({ blockchain, transactionPool, registry })
 const transactionMiner = new TransactionMiner({
   blockchain,
   transactionPool,
   wallet,
   pubsub,
 })
-let registry = new Registry()
 
 const app = express()
 
@@ -99,16 +97,14 @@ function server() {
     console.log(`[SERVER] running on ${PORT}`)
 
     if (PORT !== DEFAULT_PORT) {
+      console.log('Syncing...')
       synchronizeChain()
       synchronizeTransactionMap()
-      // broadcast your port and public key to the other nodes
-      // you also need to be aware of the ids from the other
-      
 
-      // API request to manage this?
+      pubsub.broadcastNode(PORT, wallet.publicKey)
+
+      await delay(5000)
       synchronizePeers()
-
-      // register key
     }
   })
 }
@@ -150,8 +146,8 @@ function synchronizePeers() {
         return Promise.reject({ message: 'Error occurred' })
       }
     })
-    .then(({ registry }) => {
-      registry.setRegistry(registry)
+    .then(({ registry: registryData }) => {
+      registry.setRegistry(registryData)
     })
     .catch((err) => console.error(err))
 }

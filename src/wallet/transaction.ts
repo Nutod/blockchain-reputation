@@ -1,4 +1,4 @@
-import uuid from 'uuid'
+import { v4 } from 'uuid'
 import Wallet from '.'
 import { verifySignature } from '../lib/keys'
 
@@ -39,7 +39,7 @@ export default class Transaction {
     outputMap?: TransactionOutput
     input?: TransactionInput
   }) {
-    this.id = uuid.v4()
+    this.id = v4()
     this.outputMap =
       outputMap || this.createOutputMap({ senderWallet, recipient, amount })
     this.input =

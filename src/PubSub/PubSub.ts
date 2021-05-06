@@ -6,6 +6,7 @@ import TransactionPool from '../wallet/transactionPool'
 const CHANNELS = {
   BLOCKCHAIN: 'BLOCKCHAIN',
   TRANSACTION: 'TRANSACTION',
+  NODE: 'NODE',
 }
 
 export default class PubSub {
@@ -81,6 +82,13 @@ export default class PubSub {
     this.publish({
       channel: CHANNELS.TRANSACTION,
       message: JSON.stringify(transaction),
+    })
+  }
+
+  broadcastNode(port: number, publicKey: string) {
+    this.publish({
+      channel: CHANNELS.NODE,
+      message: JSON.stringify(`${port},${publicKey}`),
     })
   }
 }

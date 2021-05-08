@@ -10,7 +10,6 @@ import TransactionMiner from './wallet/transactionMiner'
 import Registry from './lib/registry'
 import { delay } from './lib/delay'
 
-// All nodes are running an instance of these classes
 const blockchain = new Blockchain()
 const transactionPool = new TransactionPool()
 const wallet = new Wallet()
@@ -38,7 +37,7 @@ if (process.env.GENERATE_PEER_PORT === 'true') {
 
 const PORT = PEER_PORT || DEFAULT_PORT
 
-function server() {
+function main() {
   app.use(cors())
   app.use(express.json())
 
@@ -152,9 +151,9 @@ function synchronizePeers() {
     .catch((err) => console.error(err))
 }
 
-server()
+function synchronizeReputationChain() {}
 
-// TODO: Add static keys? Use a key registry? Class manages all keys mapped to ports
+main()
 
 const demoData = {
   id: 'IDENTIFICATION',
@@ -170,36 +169,3 @@ const demoData = {
     senderWallet: 5,
   },
 }
-
-// const block1 = blockchainService.mineBlock([demoData, demoData])
-
-// Synchronize Chain
-// blockchainService.synchronizeChain([block1])
-
-// Synchronize TransactionMap
-// blockchainService.synchronizeTransactionMap({
-//   somedata: demoData,
-// })
-
-// console.log(transactionPool.transactionMap)
-
-// const chainData = blockchainService.chainState()
-
-// console.log(chainData)
-
-/*  
-
-3. Wallet Info
-6. Transaction between two nodes
-
-1. Synchronize Chain - for block broadcast
-2. Synchronize TransactionMap - for transaction map synchronization
-4. Mine Transactions - by the leader
-5. Check the transaction pool
-7. Mine block - will not be called directly
-8. Check chain state
-
-*/
-
-// 1. Generate transactions that represent the transactions in the open transactions
-// 2. Run consensus

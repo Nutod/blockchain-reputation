@@ -9,11 +9,28 @@ export interface IBlock {
   timestamp: number
 }
 
+type NewBlock = {
+  lastHash: string
+  hash: string
+  data: ITransaction[]
+  timestamp: number
+
+  header: {
+    id: string
+    reputationHash: string
+  }
+}
+
+// the id is used as key to the reputation hash map
 export default class Block {
   lastHash: string
   hash: string
   data: ITransaction[]
   timestamp: number
+  // header: {
+  //   id: string
+  //   hash?: string
+  // }
 
   constructor({
     lastHash,

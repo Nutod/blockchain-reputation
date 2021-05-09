@@ -9,6 +9,7 @@ import TransactionPool from './wallet/transactionPool'
 import TransactionMiner from './wallet/transactionMiner'
 import Registry from './lib/registry'
 import { delay } from './lib/delay'
+import { random } from './lib/random'
 
 const blockchain = new Blockchain()
 const transactionPool = new TransactionPool()
@@ -49,7 +50,9 @@ function main() {
     res.status(200).json({ status: true, data: blockchain.chain })
   })
 
-  app.get('/api/transaction/pool', (_req, res) => {
+  app.get('/api/transaction/pool', async (_req, res) => {
+    await delay(500)
+
     res.status(200).json(transactionPool.transactionMap)
   })
 
@@ -78,11 +81,14 @@ function main() {
     })
   })
 
-  app.post('/api/transact', (req, res) => {
+  app.post('/api/transact', async (req, res) => {
     const { amount, recipient } = req.body as {
       amount: number
       recipient: string
     }
+
+    // simulate initial connection
+    // await delay(400)
 
     const transaction = wallet.createTransaction({ recipient, amount })
     transactionPool.setTransaction(transaction)

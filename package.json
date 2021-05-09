@@ -12,6 +12,7 @@
   "author": "Oladotun Aluko",
   "license": "MIT",
   "devDependencies": {
+    "@types/autocannon": "^4.1.0",
     "@types/cors": "^2.8.10",
     "@types/elliptic": "^6.4.12",
     "@types/express": "^4.17.11",
@@ -19,6 +20,7 @@
     "@types/node-fetch": "^2.5.10",
     "@types/redis": "^2.8.28",
     "@types/uuid": "^8.3.0",
+    "autocannon": "^7.3.0",
     "cross-env": "^5.0.2",
     "eslint": "^7.25.0",
     "nodemon": "^2.0.7",

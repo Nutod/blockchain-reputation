@@ -5,6 +5,8 @@ import { goodRatings } from '../_data/ratings'
 
 // This file will interact with nodes through the API we have provided
 
+// Managing the reputation status here
+
 const DEFAULT_PORT = 5000
 
 // Only global variables needed. All other types of data are stored in nodes
@@ -12,6 +14,7 @@ let allPeerNodesMapOfRelevantInformation = {} as {
   [id: string]: { reputation: number; publicKey: string; nodeId: string }
 }
 let nodePortArr: string[] = []
+let reputationMap: { [id: string]: number } = {}
 
 // 1. Setup nodes for interaction
 ;(async function () {
@@ -28,6 +31,7 @@ let nodePortArr: string[] = []
       }
 
       nodePortArr.push(i)
+      reputationMap[i] = DEFAULT_REPUTATION
     }
 
     // This will have all the nodes and associated information
@@ -75,7 +79,17 @@ let nodePortArr: string[] = []
       }
     }
 
-    
+    // At this point, the transactions are done, we can move on to the consensus part
+    // start by selecting the committee
+    // - sort the values first
+    // - check what 50% of the reputation value is
+    // - select nodes that have reputation values that match the figure
+
+    // randomly select the leader
+    // let the leader do all the other calculations
+    // every other member of the committee can then verify the proposition
+    // broadcast the chain to the rest of the population
+
     // 3. Run the consensus
     // 4. Repeat
     // 5. Benchmark

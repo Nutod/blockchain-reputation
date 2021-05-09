@@ -2,6 +2,8 @@ import express from 'express'
 import cors from 'cors'
 import fetch from 'node-fetch'
 
+import { performance, PerformanceObserver } from 'perf_hooks'
+
 import Blockchain from './dlt/blockchain'
 import PubSub from './PubSub/PubSub'
 import Wallet from './wallet'
@@ -9,7 +11,6 @@ import TransactionPool from './wallet/transactionPool'
 import TransactionMiner from './wallet/transactionMiner'
 import Registry from './lib/registry'
 import { delay } from './lib/delay'
-import { random } from './lib/random'
 
 const blockchain = new Blockchain()
 const transactionPool = new TransactionPool()
@@ -24,6 +25,14 @@ const transactionMiner = new TransactionMiner({
 })
 
 const app = express()
+
+// const perfObserver = new PerformanceObserver((items) => {
+//   items.getEntries().forEach((entry) => {
+//     console.log(entry)
+//   })
+// })
+
+// perfObserver.observe({ entryTypes: ['measure'], buffered: true })
 
 const DEFAULT_PORT = 5000
 let PEER_PORT
@@ -88,12 +97,11 @@ function main() {
     }
 
     // simulate initial connection
-    // await delay(400)
+    await delay(100)
 
     const transaction = wallet.createTransaction({ recipient, amount })
     transactionPool.setTransaction(transaction)
     pubsub.broadcastTransaction(transaction)
-    console.log('Pool', transactionPool)
 
     res.status(200).json({ status: true, data: transaction })
   })

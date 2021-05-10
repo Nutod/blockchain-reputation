@@ -1,5 +1,4 @@
-import express from 'express'
-import cors from 'cors'
+import fastify from 'fastify'
 import fetch from 'node-fetch'
 
 import { performance, PerformanceObserver } from 'perf_hooks'
@@ -24,15 +23,15 @@ const transactionMiner = new TransactionMiner({
   pubsub,
 })
 
-const app = express()
+const app = fastify()
 
-// const perfObserver = new PerformanceObserver((items) => {
-//   items.getEntries().forEach((entry) => {
-//     console.log(entry)
-//   })
-// })
+const perfObserver = new PerformanceObserver((items) => {
+  items.getEntries().forEach((entry) => {
+    console.log(entry)
+  })
+})
 
-// perfObserver.observe({ entryTypes: ['measure'], buffered: true })
+perfObserver.observe({ entryTypes: ['measure'], buffered: true })
 
 const DEFAULT_PORT = 5000
 let PEER_PORT
@@ -48,49 +47,66 @@ if (process.env.GENERATE_PEER_PORT === 'true') {
 const PORT = PEER_PORT || DEFAULT_PORT
 
 function main() {
-  app.use(cors())
-  app.use(express.json())
-
-  app.get('/', (_req, res) => {
-    res.json({ status: true, message: 'Do you need me to do something?' })
+  app.get('/', (_req, reply) => {
+    reply
+      .status(200)
+      .send({ status: true, message: 'Do you need me to do something?' })
   })
 
-  app.get('/api/blocks', (_req, res) => {
-    res.status(200).json({ status: true, data: blockchain.chain })
+  app.get('/api/blocks', (_req, reply) => {
+    reply.status(200).send({ status: true, data: blockchain.chain })
   })
 
-  app.get('/api/transaction/pool', async (_req, res) => {
-    await delay(500)
+  app.get('/api/transaction/pool', async (_req, reply) => {
+    // await delay(500)
 
-    res.status(200).json(transactionPool.transactionMap)
+    reply.status(200).send(transactionPool.transactionMap)
   })
 
-  app.get('/api/transaction/mine', (_req, res) => {
+  app.get('/api/transaction/mine', async (_req, reply) => {
+    // performance.mark('mining-start')
+
+    // // Testing the block production time with block sizes
+    // for (let i = 0; i < 500; i++) {
+    //   await delay(50)
+
+    //   const transaction = wallet.createTransaction({
+    //     recipient: '-RECIPIENT-',
+    //     amount: 0.8,
+    //   })
+    //   transactionPool.setTransaction(transaction)
+    //   pubsub.broadcastTransaction(transaction)
+    // }
+
+    // Do a specific amount of transactions first before you mine
     transactionMiner.mineTransactions()
 
-    res.status(200).json({ status: true, message: 'Mined' })
-    // res.redirect('/api/blocks')
+    // performance.mark('mining-end')
+
+    // performance.measure('mining', 'mining-start', 'mining-end')
+
+    reply.status(200).send({ status: true, message: 'Mined' })
   })
 
-  app.get('/api/wallet/info', (_req, res) => {
+  app.get('/api/wallet/info', (_req, reply) => {
     const address = wallet.publicKey
 
-    res.json({
+    reply.send({
       status: true,
       address,
     })
   })
 
-  app.get('/api/synchronize/peers', (_req, res) => {
+  app.get('/api/synchronize/peers', (_req, reply) => {
     const keyToNodeMap = registry.keyToNodeMap
 
-    res.json({
+    reply.send({
       status: true,
       registry: keyToNodeMap,
     })
   })
 
-  app.post('/api/transact', async (req, res) => {
+  app.post('/api/transact', async (req, reply) => {
     const { amount, recipient } = req.body as {
       amount: number
       recipient: string
@@ -103,7 +119,7 @@ function main() {
     transactionPool.setTransaction(transaction)
     pubsub.broadcastTransaction(transaction)
 
-    res.status(200).json({ status: true, data: transaction })
+    reply.status(200).send({ status: true, data: transaction })
   })
 
   app.listen(PORT, async () => {

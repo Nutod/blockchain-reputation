@@ -22,8 +22,8 @@ let allPeerNodesMapOfRelevantInformation = {} as {
   [id: string]: { reputation: number; publicKey: string; nodeId: string }
 }
 let nodePortArr: string[] = []
-let reputationMap: { key: string; value: number }[] = []
-let consensusNodes: { key: string; value: number }[] = []
+let reputationMap: { key: string; value: number; nodeId: string }[] = []
+let consensusNodes: { key: string; value: number; nodeId: string }[] = []
 
 // 1. Setup nodes for interaction
 ;(async function () {
@@ -33,7 +33,7 @@ let consensusNodes: { key: string; value: number }[] = []
     ).json()
 
     for (let i in registry) {
-      const TRIAL_REPUTATION_VALUE = DEFAULT_REPUTATION * random(20)
+      const TRIAL_REPUTATION_VALUE = DEFAULT_REPUTATION
       allPeerNodesMapOfRelevantInformation[i] = {
         reputation: TRIAL_REPUTATION_VALUE,
         publicKey: registry[i],
@@ -41,10 +41,14 @@ let consensusNodes: { key: string; value: number }[] = []
       }
 
       nodePortArr.push(i)
-      reputationMap.push({ key: registry[i], value: TRIAL_REPUTATION_VALUE })
+      reputationMap.push({
+        key: registry[i],
+        value: TRIAL_REPUTATION_VALUE,
+        nodeId: i,
+      })
     }
 
-    console.log(reputationMap)
+    // console.log(reputationMap)
 
     // This will have all the nodes and associated information
 
@@ -135,6 +139,15 @@ let consensusNodes: { key: string; value: number }[] = []
 
     // let the leader do all the other calculations
     // send a request to the leaders endpoint that has computation thing and wait for the result
+    const reply = await (
+      await fetch(
+        `http://localhost:${consensusLeader.nodeId}/api/consensus/leader`,
+      )
+    ).json()
+
+    console.log(reply)
+
+    // package the block, calculate new reputation values
 
     // every other member of the committee can then verify the proposition
     // send a request to all the nodes and wait for their responses

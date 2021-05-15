@@ -1,5 +1,6 @@
 import fastify from 'fastify'
 import fetch from 'node-fetch'
+import { add, multiply, sqrt, divide } from 'mathjs'
 
 import { performance, PerformanceObserver } from 'perf_hooks'
 
@@ -10,6 +11,7 @@ import TransactionPool from './wallet/transactionPool'
 import TransactionMiner from './wallet/transactionMiner'
 import Registry from './lib/registry'
 import { delay } from './lib/delay'
+import { TransactionOutput } from './wallet/transaction'
 
 const blockchain = new Blockchain()
 const transactionPool = new TransactionPool()
@@ -106,6 +108,101 @@ function main() {
     })
   })
 
+  app.get('/api/consensus/leader', async (_req, reply) => {
+    let reputationMap = {} as {
+      [id: string]: { reputation: number; nodeId: string }
+    }
+
+    let intermediateReputation = {} as any
+
+    let transactionsHash = {} as { [id: string]: TransactionOutput[] }
+
+    // go into the transaction pool
+    // for all the nodes in the registry, do something by looping over all the nodes
+
+    Object.keys(registry.keyToNodeMap).forEach((key, _index) => {
+      const transactionRatingsArray: TransactionOutput[] = []
+      // i is the key
+      let address = registry.keyToNodeMap[key]
+
+      for (let j in transactionPool.transactionMap) {
+        let transactionOutputMap = transactionPool.transactionMap[j].outputMap
+
+        // grab all the transactions for which i is the recipient and dump in an array
+        if (transactionOutputMap.recipient === address) {
+          transactionRatingsArray.push(transactionOutputMap)
+        }
+      }
+
+      transactionsHash[address] = transactionRatingsArray
+    })
+
+    for (const key in registry.keyToNodeMap) {
+      const nodeTransactions = transactionsHash[registry.keyToNodeMap[key]]
+
+      let ratingsMap = nodeTransactions.map((transaction) => transaction.amount)
+      let ratersReputationMap = nodeTransactions.map(
+        (transaction) => transaction.senderWallet,
+      )
+
+      // get the maximum and minimum values for transaction ratings
+      let maximumTransactionRating = Math.max(...ratingsMap)
+      let minimumTransactionRating = Math.min(...ratingsMap)
+
+      let normalizedRatingsMap = nodeTransactions.map((transaction) => {
+        const denominator = add(
+          maximumTransactionRating - minimumTransactionRating,
+          1,
+        )
+        const numerator = add(transaction.amount - minimumTransactionRating, 1)
+
+        const normalizedRating = Number(numerator) / Number(denominator)
+
+        return normalizedRating
+      })
+
+      if (normalizedRatingsMap.length) {
+        const normalizedRatingValue = multiply(
+          normalizedRatingsMap,
+          ratersReputationMap,
+        )
+        intermediateReputation[key] = normalizedRatingValue
+      } else {
+        intermediateReputation[key] = 0
+      }
+    }
+
+    for (const key in registry.keyToNodeMap) {
+      const ALPHA_CONST = 0.6
+      const BETA_CONST = 1 - ALPHA_CONST
+      const unclampedReputationValue =
+        Number(multiply(ALPHA_CONST, intermediateReputation[key])) +
+        Number(multiply(BETA_CONST, 0.2))
+
+      // Apply a sigmoid function thing here to clamp all values
+      const clampedReputationValueDenominator = sqrt(
+        1 + unclampedReputationValue ** 2,
+      )
+
+      const clampedReputationValue = divide(
+        unclampedReputationValue,
+        clampedReputationValueDenominator,
+      )
+
+      // calculate reputation values
+
+      reputationMap[key] = {
+        reputation: clampedReputationValue,
+        nodeId: key,
+      }
+    }
+
+    reply.send({
+      status: true,
+      reputationMap: reputationMap,
+    })
+  })
+
   app.post('/api/transact', async (req, reply) => {
     const { amount, recipient } = req.body as {
       amount: number
@@ -113,7 +210,7 @@ function main() {
     }
 
     // simulate initial connection
-    await delay(100)
+    await delay(200)
 
     const transaction = wallet.createTransaction({ recipient, amount })
     transactionPool.setTransaction(transaction)

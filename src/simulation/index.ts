@@ -3,6 +3,14 @@ import { DEFAULT_REPUTATION } from '../config'
 import { random } from '../lib/random'
 import { goodRatings } from '../_data/ratings'
 
+import { performance, PerformanceObserver } from 'perf_hooks'
+
+const perfObserver = new PerformanceObserver((items) => {
+  items.getEntries().forEach((entry) => {
+    console.log(entry)
+  })
+})
+
 // This file will interact with nodes through the API we have provided
 
 // Managing the reputation status here
@@ -113,20 +121,30 @@ let consensusNodes: { key: string; value: number }[] = []
       }
     }
 
+    // performance.mark('consensus-start')
+
     // consensus can start here
     console.log(consensusNodes)
     // - select nodes that have reputation values that match the figure
 
     // randomly select the leader
-    // let the leader do all the other calculations
-    // every other member of the committee can then verify the proposition
-    // broadcast the chain to the rest of the population
-    
     const consensusLeader = consensusNodes[random(consensusNodes.length)]
     const consensusGroupNodes = consensusNodes.filter(
       (node) => consensusLeader.key !== node.key,
     )
 
+    // let the leader do all the other calculations
+    // send a request to the leaders endpoint that has computation thing and wait for the result
+
+    // every other member of the committee can then verify the proposition
+    // send a request to all the nodes and wait for their responses
+
+    // broadcast the chain to the rest of the population
+    // leader can then broadcast this result to the result of the network
+
+    // performance.mark('consensus-end')
+
+    // performance.measure('consensus', 'consensus-start', 'consensus-end')
 
     // 3. Run the consensus
     // 4. Repeat

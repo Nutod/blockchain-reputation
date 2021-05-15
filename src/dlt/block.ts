@@ -27,10 +27,6 @@ export default class Block {
   hash: string
   data: ITransaction[]
   timestamp: number
-  // header: {
-  //   id: string
-  //   hash?: string
-  // }
 
   constructor({
     lastHash,

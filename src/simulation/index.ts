@@ -4,12 +4,15 @@ import { random } from '../lib/random'
 import { goodRatings } from '../_data/ratings'
 
 import { performance, PerformanceObserver } from 'perf_hooks'
+import { delay } from '../lib/delay'
 
 const perfObserver = new PerformanceObserver((items) => {
   items.getEntries().forEach((entry) => {
     console.log(entry)
   })
 })
+
+perfObserver.observe({ entryTypes: ['measure'], buffered: true })
 
 // This file will interact with nodes through the API we have provided
 
@@ -21,7 +24,7 @@ const DEFAULT_PORT = 5000
 let allPeerNodesMapOfRelevantInformation = {} as {
   [id: string]: { reputation: number; publicKey: string; nodeId: string }
 }
-let nodePortArr: string[] = []
+let nodePortArr: string[] = ['5000']
 let reputationMap: { key: string; value: number; nodeId: string }[] = []
 let consensusNodes: { key: string; value: number; nodeId: string }[] = []
 
@@ -48,7 +51,7 @@ let consensusNodes: { key: string; value: number; nodeId: string }[] = []
       })
     }
 
-    // console.log(reputationMap)
+    console.log(reputationMap)
 
     // This will have all the nodes and associated information
 
@@ -69,12 +72,14 @@ let consensusNodes: { key: string; value: number; nodeId: string }[] = []
 
     let numberOfRequests = transactionPoolSize / nodePortArr.length
 
+    // console.log(numberOfRequests)
+
     for (let i = 0; i < nodePortArr.length; i++) {
       let availableNodes = nodePortArr.filter((node) => node !== nodePortArr[i])
 
       // select one element and after interaction, add to the nodesInteractedWith array
 
-      for (let j = 0; j < numberOfRequests; j++) {
+      for (let j = 0; j < 10; j++) {
         let selectedNode = availableNodes.shift() as string
 
         // send a request to the selected node
@@ -125,7 +130,7 @@ let consensusNodes: { key: string; value: number; nodeId: string }[] = []
       }
     }
 
-    // performance.mark('consensus-start')
+    performance.mark('consensus-start')
 
     // consensus can start here
     console.log(consensusNodes)
@@ -149,15 +154,27 @@ let consensusNodes: { key: string; value: number; nodeId: string }[] = []
 
     // package the block, calculate new reputation values
 
+    for (let j = 0; j < consensusGroupNodes.length; j++) {
+      await delay(200)
+    }
+
+    const mineBlockResponse = await (
+      await fetch(
+        `http://localhost:${consensusLeader.nodeId}/api/transaction/mine`,
+      )
+    ).json()
+
+    console.log(mineBlockResponse)
+    // /api/transaction/mine
     // every other member of the committee can then verify the proposition
     // send a request to all the nodes and wait for their responses
 
     // broadcast the chain to the rest of the population
     // leader can then broadcast this result to the result of the network
 
-    // performance.mark('consensus-end')
+    performance.mark('consensus-end')
 
-    // performance.measure('consensus', 'consensus-start', 'consensus-end')
+    performance.measure('consensus', 'consensus-start', 'consensus-end')
 
     // 3. Run the consensus
     // 4. Repeat

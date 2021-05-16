@@ -6,7 +6,7 @@ export interface TransactionMap {
   [id: string]: ITransaction
 }
 
-const DEFAULT = {
+export const DEFAULT = {
   'ef27430f-90c0-4156-a9bf-e3e7e840cea5': {
     id: 'ef27430f-90c0-4156-a9bf-e3e7e840cea5',
     outputMap: {
@@ -312,7 +312,7 @@ export default class TransactionPool {
   transactionMap: TransactionMap
 
   constructor() {
-    this.transactionMap = DEFAULT
+    this.transactionMap = {} as TransactionMap
   }
 
   setTransaction(transaction: ITransaction) {

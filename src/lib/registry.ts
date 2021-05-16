@@ -1,4 +1,4 @@
-const DEFAULT = {
+export const DEFAULT = {
   '5000': '02aacdab0e4bb5359f04b62f9bf365d08a07db903886af8e542dc1006a574e388b',
   '5001': '039560d5f334b0b7b69f6d8adec59898bdc17937fd37d0406384521ef3b266000b',
   '5002': '02b8df2c0b2f3b6d365e775cab4cc1fd36c546bfdd18ee6bf91af334515d4ff2a9',
@@ -10,10 +10,9 @@ export default class Registry {
   keyToNodeMap: { [id: string]: string }
 
   constructor() {
-    this.keyToNodeMap = DEFAULT
-    // {} as {
-    //   [id: string]: string
-    // }
+    this.keyToNodeMap = {} as {
+      [id: string]: string
+    }
   }
 
   addToRegistry(id: string, publicKey: string) {
